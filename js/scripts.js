@@ -3,6 +3,16 @@ const generatePasswordButton = document.querySelector('#generate-password')
 const generatedPasswordElement = document.querySelector('#generated-password')
 
 
+// NOVAS FUNCIONALIDADES
+const openCloseGeneratorButton = document.querySelector('#open-generate-password')
+const generatePasswordContainer = document.querySelector('#generate-options')
+const lengthInput = document.querySelector('#length')
+const letterInput = document.querySelector('#letters')
+const numberInput = document.querySelector('#numbers')
+const symbolInput = document.querySelector('#symbols')
+const copyPasswordButton = document.querySelector('#copy-password')
+
+
 // FUNÇÕES
 // Primeiro de tudo vou pegar o key code (id) de cada tecla do teclado que for pressionada. Pra ajudar, existe uma tabela de referencia no 'ascii character' com o indice de cada caractere. Com base nela, desenvolvemos uma logica e função para selecionar o caractere ao clique do usuario:
 
@@ -37,10 +47,30 @@ const getSymbol = () => {
 const generatePassword = (getLetterLowerCase, getLetterUpperCase, getNumber, getSymbol) => {
     let password = ''
     
-    const passwordLength = 10
+    const passwordLength = +lengthInput.value
 
-    const generators = [getLetterLowerCase, getLetterUpperCase, getNumber, getSymbol]
+    const generators = []
 
+    
+    if(letterInput.checked) {
+        generators.push(getLetterLowerCase, getLetterUpperCase)
+    }
+
+    if(numberInput.checked) {
+        generators.push(getNumber)
+    }
+
+    if(symbolInput.checked) {
+        generators.push(getSymbol)
+    }
+
+    console.log(generators.length)
+
+    if(generators.length === 0) {
+        return
+    }
+
+    
     for(i = 0; i < passwordLength; i = i + generators.length) {
         generators.forEach(() => {
             const randomValue = generators[Math.floor(Math.random() * generators.length)]()
@@ -67,3 +97,23 @@ generatePasswordButton.addEventListener('click', () => {
     generatePassword(getLetterLowerCase, getLetterUpperCase, getNumber, getSymbol)
 })
 
+
+
+openCloseGeneratorButton.addEventListener('click', () => {
+    generatePasswordContainer.classList.toggle('hide')
+})
+
+
+copyPasswordButton.addEventListener('click', (e) => {
+    e.preventDefault()
+
+    const password = generatedPasswordElement.querySelector('h4').innerText
+    
+    navigator.clipboard.writeText(password).then(() => {
+        copyPasswordButton.innerText = 'Copiado!'
+
+        setTimeout(() =>{
+            copyPasswordButton.innerText = 'Copiar'
+        }, 1500)
+    })
+})
